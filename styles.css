@@ -111,19 +111,29 @@ body{
   from{opacity:0;transform:translateY(-20px);}
   to{opacity:1;transform:translateY(0);}
 }
+
 .avatar-wrapper{margin-bottom:20px;display:flex;justify-content:center;}
 .avatar{
   width:80px;height:80px;
   background:linear-gradient(135deg,var(--primary-yellow),var(--primary-red));
   border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-size:48px;
   box-shadow:0 0 30px rgba(255,215,0,0.4);
   animation:pulse 3s ease-in-out infinite;
+  overflow:hidden;
 }
 @keyframes pulse{
   0%,100%{box-shadow:0 0 30px rgba(255,215,0,0.4);}
   50%{box-shadow:0 0 50px rgba(255,68,68,0.5);}
+}
+
+/* Foto profilo nel cerchio */
+.avatar-img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  object-position:center;
 }
 
 .username{
@@ -273,9 +283,7 @@ body{
   background: rgba(0,0,0,0.6);
   backdrop-filter: blur(6px);
 }
-.cat-wrap{
-  position:relative;
-}
+.cat-wrap{position:relative;}
 .cat-img{
   width:100%;
   height:auto;
@@ -283,8 +291,8 @@ body{
   border-radius:16px;
   border:1px solid rgba(255,255,255,0.12);
   box-shadow:0 24px 60px rgba(0,0,0,0.55);
-  max-height: 80vh;
-  object-fit: cover;
+  max-height:80vh;
+  object-fit:cover;
 }
 .cat-close{
   position:absolute;
@@ -316,7 +324,7 @@ body{
 @media (max-width:480px){
   .container{padding:50px 16px 30px;}
   .username{font-size:36px;}
-  .avatar{width:70px;height:70px;font-size:42px;}
+  .avatar{width:70px;height:70px;}
   .top-bar{top:16px;right:16px;}
   .music-btn{padding:6px 10px;font-size:12px;}
   .music-label{font-size:11px;}
