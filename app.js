@@ -179,7 +179,6 @@ function setupOF() {
     bgResumeTime = bg.currentTime || 0;
 
     bg.pause();
-    bg.currentTime = bgResumeTime;
 
     try { dialog.showModal(); } catch { dialog.setAttribute("open", ""); }
 
@@ -202,7 +201,7 @@ function setupOF() {
     }, 10000);
   });
 
-  troll.addEventListener("ended", () => { // chiude quando finisce [web:229]
+  troll.addEventListener("ended", () => {
     if (autoCloseTimer) clearTimeout(autoCloseTimer);
     try { dialog.close(); } catch {}
   });
@@ -217,7 +216,7 @@ function setupOF() {
     if (!inside) dialog.close();
   });
 
-  dialog.addEventListener("close", async () => { // ripristino [web:179]
+  dialog.addEventListener("close", async () => {
     if (autoCloseTimer) clearTimeout(autoCloseTimer);
 
     troll.pause();
