@@ -81,10 +81,11 @@ class MusicPlayer {
     if (!this.audio || !this.btn || !this.dot || !this.label) return;
 
     this.audio.volume = 0.35;
+
     this.btn.addEventListener("click", () => this.toggle());
 
     this.audio.addEventListener("error", () => {
-      this.setError("Audio not available");
+      this.setError("Music file not found / unsupported");
       this.btn.disabled = true;
     });
   }
@@ -97,7 +98,7 @@ class MusicPlayer {
 
   async toggle() {
     if (!this.audio.src || this.audio.error) {
-      this.setError("Audio not available");
+      this.setError("Music file not found / unsupported");
       return;
     }
 
@@ -112,6 +113,7 @@ class MusicPlayer {
       await this.audio.play();
       this.isPlaying = true;
       this.updateUI();
+      this.errorMsg?.classList.remove("show");
     } catch {
       this.setError("Cannot play audio");
       this.isPlaying = false;
@@ -136,7 +138,6 @@ class MusicPlayer {
 
 function setupMouseParallax() {
   if (window.innerWidth <= 768) return;
-
   const tracker = document.querySelector(".mouse-tracker");
   if (!tracker) return;
 
@@ -163,36 +164,60 @@ function setupOF() {
   const btn = document.getElementById("ofBtn");
   const dialog = document.getElementById("catDialog");
   const closeBtn = document.getElementById("catClose");
+  const catImg = dialog?.querySelector(".cat-img");
 
   const bg = document.getElementById("bgMusic");
-  const musicBtn = document.getElementById("musicBtn"); // per aggiornare aria-pressed/UI
   const troll = document.getElementById("trollAudio");
+  const uiError = document.getElementById("audioError");
 
-  if (!btn || !dialog || !closeBtn || !troll || !bg) return;
+  if (!btn || !dialog || !closeBtn || !bg || !troll || !catImg) return;
 
   let bgWasPlaying = false;
   let bgResumeTime = 0;
 
-  btn.addEventListener("click", async () => {
-    // salva stato musica normale
-    bgWasPlaying = !bg.paused;
-    bgResumeTime = bg.currentTime || 0; // posizione corrente [web:186]
+  catImg.addEventListener("error", () => {
+    if (uiError) {
+      uiError.textContent = "gatto.jpg not found";
+      uiError.classList.add("show");
+    }
+  });
 
-    // stoppa musica normale
+  troll.addEventListener("error", () => {
+    if (uiError) {
+      uiError.textContent = "troll.mp3 not found / unsupported";
+      uiError.classList.add("show");
+    }
+  });
+
+  btn.addEventListener("click", async () => {
+    // pausa musica normale e salva posizione
+    bgWasPlaying = !bg.paused;
+    bgResumeTime = bg.currentTime || 0; // [web:186]
     bg.pause(); // [web:183]
 
-    // apri dialog
-    try { dialog.showModal(); } catch { dialog.setAttribute("open", ""); }
+    // apri popup
+    try {
+      dialog.showModal();
+    } catch {
+      dialog.setAttribute("open", "");
+    }
 
-    // parte troll (user gesture -> di solito ok) [web:53]
+    // play troll
     troll.currentTime = 0; // [web:186]
-    troll.volume = 0.7;
-    try { await troll.play(); } catch {}
+    troll.volume = 0.9;
+    try {
+      await troll.play(); // spesso ok perché dentro click [web:53]
+      uiError?.classList.remove("show");
+    } catch {
+      if (uiError) {
+        uiError.textContent = "Cannot play audio";
+        uiError.classList.add("show");
+      }
+    }
   });
 
   closeBtn.addEventListener("click", () => dialog.close());
 
-  // click backdrop per chiudere
   dialog.addEventListener("click", (e) => {
     const rect = dialog.getBoundingClientRect();
     const inside =
@@ -201,33 +226,13 @@ function setupOF() {
     if (!inside) dialog.close();
   });
 
-  // quando chiude: ferma troll e riprende musica normale se era attiva
   dialog.addEventListener("close", async () => { // [web:179]
     troll.pause(); // [web:183]
-
     if (bgWasPlaying) {
       try {
         bg.currentTime = bgResumeTime; // [web:186]
         await bg.play(); // [web:53]
       } catch {}
-    }
-
-    // aggiorna stato visivo del toggle musica (se esiste)
-    if (musicBtn) {
-      musicBtn.setAttribute("aria-pressed", String(!bg.paused));
-      const dot = musicBtn.querySelector(".music-dot");
-      const label = musicBtn.querySelector(".music-label");
-      if (dot && label) {
-        if (!bg.paused) {
-          label.textContent = "Music: On";
-          dot.style.background = "rgba(255,215,0,0.75)";
-          dot.style.boxShadow = "0 0 14px rgba(255,215,0,0.45)";
-        } else {
-          label.textContent = "Music: Off";
-          dot.style.background = "rgba(255,68,68,0.55)";
-          dot.style.boxShadow = "0 0 12px rgba(255,68,68,0.35)";
-        }
-      }
     }
   });
 }
