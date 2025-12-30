@@ -103,15 +103,21 @@
   </main>
 
   <dialog id="catDialog" class="cat-dialog" aria-label="Gatto">
-    <button id="catClose" class="cat-close" type="button" aria-label="Chiudi">×</button>
-    <img class="cat-img" src="./gatto.jpg" alt="Gatto">
+    <div class="cat-wrap">
+      <button id="catClose" class="cat-close" type="button" aria-label="Chiudi">×</button>
+      <img class="cat-img" src="./gatto.jpg" alt="Gatto">
+    </div>
   </dialog>
 
-  <!-- Musica "normale" (come nel tuo repo attuale) -->
-  <audio id="bgMusic" preload="none" src="./loser.mp.mp3"></audio>
+  <!-- Musica normale -->
+  <audio id="bgMusic" preload="none">
+    <source src="./loser.mp.mp3" type="audio/mpeg">
+  </audio>
 
   <!-- Musica troll -->
-  <audio id="trollAudio" preload="none" src="./troll.mp3"></audio>
+  <audio id="trollAudio" preload="none">
+    <source src="./troll.mp3" type="audio/mpeg">
+  </audio>
 
   <script src="./app.js" defer></script>
 </body>
