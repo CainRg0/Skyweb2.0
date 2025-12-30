@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Link hub per stankygae." />
+  <meta name="theme-color" content="#FFD700" />
+
+  <meta property="og:title" content="stankygae" />
+  <meta property="og:description" content="Link hub per stankygae." />
+
+  <title>stankygae • links</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://kit.fontawesome.com/a2e0e6ad00.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div class="background-container" aria-hidden="true">
+    anvas id="animatedBg"></canvas>
+    <div class="gradient-overlay"></div>
+    <div class="mouse-tracker"></div>
+  </div>
+
+  <header class="top-bar">
+    <div class="music-toggle">
+      <button id="musicBtn" class="music-btn" type="button" aria-pressed="false" aria-label="Attiva o disattiva la musica">
+        <i class="fas fa-volume-mute" aria-hidden="true"></i>
+        <span class="music-label">Music: Off</span>
+      </button>
+      <div id="audioError" class="audio-error" role="status" aria-live="polite"></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="avatar-wrapper">
+        <div class="avatar" aria-hidden="true">★</div>
+      </div>
+      <h1 class="username">stankygae</h1>
+      <p class="tagline">Link hub</p>
+    </section>
+
+    <section class="links-grid" aria-label="Collegamenti">
+      <a class="link-card" href="https://www.tiktok.com/@stankygae?_t=ZN-8t8df0gdJm2&_r=1" target="_blank" rel="noopener">
+        <span class="card-glow" aria-hidden="true"></span>
+        <div class="card-icon" aria-hidden="true"><i class="fab fa-tiktok"></i></div>
+        <div class="card-content">
+          <h2>TikTok</h2>
+          <p>@stankygae</p>
+        </div>
+      </a>
+
+      <a class="link-card" href="https://throne.com/stankygae" target="_blank" rel="noopener">
+        <span class="card-glow" aria-hidden="true"></span>
+        <div class="card-icon" aria-hidden="true"><i class="fas fa-crown"></i></div>
+        <div class="card-content">
+          <h2>Throne</h2>
+          <p>Support hub</p>
+        </div>
+      </a>
+
+      <a class="link-card" href="https://www.instagram.com/stankygae" target="_blank" rel="noopener">
+        <span class="card-glow" aria-hidden="true"></span>
+        <div class="card-icon" aria-hidden="true"><i class="fab fa-instagram"></i></div>
+        <div class="card-content">
+          <h2>Instagram</h2>
+          <p>@stankygae</p>
+        </div>
+      </a>
+
+      <a class="link-card" href="https://x.com/StankyGae" target="_blank" rel="noopener">
+        <span class="card-glow" aria-hidden="true"></span>
+        <div class="card-icon" aria-hidden="true"><i class="fab fa-x-twitter"></i></div>
+        <div class="card-content">
+          <h2>X</h2>
+          <p>@StankyGae</p>
+        </div>
+      </a>
+    </section>
+
+    <section class="actions">
+      <button id="copyLinkBtn" class="copy-link-btn" type="button">
+        <i class="fas fa-link" aria-hidden="true"></i>
+        <span>Copy link</span>
+      </button>
+    </section>
+
+    <footer class="badge">
+      <p>Made for stankygae</p>
+    </footer>
+  </main>
+
+  <audio id="bgMusic" preload="none" src="./loser.mp3"></audio>
+
+  <script src="app.js"></script>
+</body>
+</html>
