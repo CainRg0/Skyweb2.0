@@ -220,21 +220,37 @@ body{
   opacity:0;
 }
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-.copy-link-btn{
-  display:flex;align-items:center;gap:8px;
-  padding:10px 20px;
-  background:linear-gradient(135deg,var(--primary-yellow),var(--accent-gold));
-  border:none;border-radius:10px;
-  color:#000;
-  font-weight:800;
-  font-size:14px;
-  cursor:pointer;
-  transition:all var(--transition-fast);
-}
-.copy-link-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(255,215,0,0.3);}
-.copy-link-btn:active{transform:scale(0.97);}
-.copy-link-btn:focus-visible{outline:2px solid var(--primary-yellow);outline-offset:2px;}
 
+/* OF button */
+.of-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:12px 26px;
+  background: linear-gradient(135deg, #2d7dff, #00c2ff);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 14px;
+  color:#fff;
+  font-weight: 900;
+  font-size: 16px;
+  cursor:pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: 0 10px 24px rgba(0, 120, 255, 0.25);
+}
+.of-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(0, 120, 255, 0.35);
+}
+.of-btn:active{ transform: scale(0.98); }
+.of-btn:focus-visible{ outline:2px solid #7fd6ff; outline-offset:2px; }
+.of-heart{
+  color:#ff4d6d;
+  text-shadow: 0 0 14px rgba(255, 77, 109, 0.45);
+  font-size:18px;
+}
+
+/* Badge */
 .badge{
   text-align:center;
   padding-top:20px;
@@ -244,6 +260,39 @@ body{
   opacity:0;
 }
 .badge p{font-size:12px;color:rgba(255,255,255,0.55);font-weight:500;}
+
+/* Modal */
+.cat-dialog{
+  border: 0;
+  padding: 0;
+  background: transparent;
+  max-width: min(92vw, 520px);
+}
+.cat-dialog::backdrop{
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+}
+.cat-img{
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+}
+.cat-close{
+  position: absolute;
+  right: 0;
+  transform: translate(12px, -44px);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  font-size: 26px;
+  cursor: pointer;
+}
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce){
