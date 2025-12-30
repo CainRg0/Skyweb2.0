@@ -134,45 +134,6 @@ class MusicPlayer {
   }
 }
 
-function setupCopyLink() {
-  const btn = document.getElementById("copyLinkBtn");
-  if (!btn) return;
-
-  btn.addEventListener("click", async () => {
-    const url = window.location.href;
-    const originalHTML = btn.innerHTML;
-
-    const setCopiedUI = () => {
-      btn.innerHTML = '<span aria-hidden="true">✅</span><span>Copied!</span>';
-      btn.style.background = "linear-gradient(135deg, #4CAF50, #45a049)";
-      setTimeout(() => {
-        btn.innerHTML = originalHTML;
-        btn.style.background = "";
-      }, 2000);
-    };
-
-    try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(url);
-        setCopiedUI();
-        return;
-      }
-      throw new Error("clipboard not available");
-    } catch {
-      const textarea = document.createElement("textarea");
-      textarea.value = url;
-      textarea.setAttribute("readonly", "");
-      textarea.style.position = "absolute";
-      textarea.style.left = "-9999px";
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
-      setCopiedUI();
-    }
-  });
-}
-
 function setupMouseParallax() {
   if (window.innerWidth <= 768) return;
 
@@ -198,13 +159,85 @@ function setupCardAnimations() {
   });
 }
 
+function setupOF() {
+  const btn = document.getElementById("ofBtn");
+  const dialog = document.getElementById("catDialog");
+  const closeBtn = document.getElementById("catClose");
+
+  const bg = document.getElementById("bgMusic");
+  const musicBtn = document.getElementById("musicBtn"); // per aggiornare aria-pressed/UI
+  const troll = document.getElementById("trollAudio");
+
+  if (!btn || !dialog || !closeBtn || !troll || !bg) return;
+
+  let bgWasPlaying = false;
+  let bgResumeTime = 0;
+
+  btn.addEventListener("click", async () => {
+    // salva stato musica normale
+    bgWasPlaying = !bg.paused;
+    bgResumeTime = bg.currentTime || 0; // posizione corrente [web:186]
+
+    // stoppa musica normale
+    bg.pause(); // [web:183]
+
+    // apri dialog
+    try { dialog.showModal(); } catch { dialog.setAttribute("open", ""); }
+
+    // parte troll (user gesture -> di solito ok) [web:53]
+    troll.currentTime = 0; // [web:186]
+    troll.volume = 0.7;
+    try { await troll.play(); } catch {}
+  });
+
+  closeBtn.addEventListener("click", () => dialog.close());
+
+  // click backdrop per chiudere
+  dialog.addEventListener("click", (e) => {
+    const rect = dialog.getBoundingClientRect();
+    const inside =
+      e.clientX >= rect.left && e.clientX <= rect.right &&
+      e.clientY >= rect.top && e.clientY <= rect.bottom;
+    if (!inside) dialog.close();
+  });
+
+  // quando chiude: ferma troll e riprende musica normale se era attiva
+  dialog.addEventListener("close", async () => { // [web:179]
+    troll.pause(); // [web:183]
+
+    if (bgWasPlaying) {
+      try {
+        bg.currentTime = bgResumeTime; // [web:186]
+        await bg.play(); // [web:53]
+      } catch {}
+    }
+
+    // aggiorna stato visivo del toggle musica (se esiste)
+    if (musicBtn) {
+      musicBtn.setAttribute("aria-pressed", String(!bg.paused));
+      const dot = musicBtn.querySelector(".music-dot");
+      const label = musicBtn.querySelector(".music-label");
+      if (dot && label) {
+        if (!bg.paused) {
+          label.textContent = "Music: On";
+          dot.style.background = "rgba(255,215,0,0.75)";
+          dot.style.boxShadow = "0 0 14px rgba(255,215,0,0.45)";
+        } else {
+          label.textContent = "Music: Off";
+          dot.style.background = "rgba(255,68,68,0.55)";
+          dot.style.boxShadow = "0 0 12px rgba(255,68,68,0.35)";
+        }
+      }
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("animatedBg");
-  if (canvas && canvas.getContext) {
-    new ParticleBackground(canvas);
-  }
+  if (canvas && canvas.getContext) new ParticleBackground(canvas);
+
   new MusicPlayer();
-  setupCopyLink();
+  setupOF();
   setupMouseParallax();
   setupCardAnimations();
 });
