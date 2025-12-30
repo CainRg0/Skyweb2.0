@@ -97,7 +97,7 @@ class MusicPlayer {
   }
 
   async toggle() {
-    if (!this.audio.src || this.audio.error) {
+    if (!this.audio || this.audio.error) {
       this.setError("Music file not found / unsupported");
       return;
     }
@@ -123,7 +123,6 @@ class MusicPlayer {
 
   updateUI() {
     this.btn.setAttribute("aria-pressed", String(this.isPlaying));
-
     if (this.isPlaying) {
       this.label.textContent = "Music: On";
       this.dot.style.background = "rgba(255,215,0,0.75)";
@@ -164,49 +163,31 @@ function setupOF() {
   const btn = document.getElementById("ofBtn");
   const dialog = document.getElementById("catDialog");
   const closeBtn = document.getElementById("catClose");
-  const catImg = dialog?.querySelector(".cat-img");
 
   const bg = document.getElementById("bgMusic");
   const troll = document.getElementById("trollAudio");
   const uiError = document.getElementById("audioError");
 
-  if (!btn || !dialog || !closeBtn || !bg || !troll || !catImg) return;
+  if (!btn || !dialog || !closeBtn || !bg || !troll) return;
 
   let bgWasPlaying = false;
   let bgResumeTime = 0;
-
-  catImg.addEventListener("error", () => {
-    if (uiError) {
-      uiError.textContent = "gatto.jpg not found";
-      uiError.classList.add("show");
-    }
-  });
-
-  troll.addEventListener("error", () => {
-    if (uiError) {
-      uiError.textContent = "troll.mp3 not found / unsupported";
-      uiError.classList.add("show");
-    }
-  });
+  let autoCloseTimer = null;
 
   btn.addEventListener("click", async () => {
-    // pausa musica normale e salva posizione
     bgWasPlaying = !bg.paused;
-    bgResumeTime = bg.currentTime || 0; // [web:186]
-    bg.pause(); // [web:183]
+    bgResumeTime = bg.currentTime || 0;
 
-    // apri popup
-    try {
-      dialog.showModal();
-    } catch {
-      dialog.setAttribute("open", "");
-    }
+    bg.pause();
+    bg.currentTime = bgResumeTime;
 
-    // play troll
-    troll.currentTime = 0; // [web:186]
+    try { dialog.showModal(); } catch { dialog.setAttribute("open", ""); }
+
+    troll.currentTime = 0;
     troll.volume = 0.9;
+
     try {
-      await troll.play(); // spesso ok perché dentro click [web:53]
+      await troll.play();
       uiError?.classList.remove("show");
     } catch {
       if (uiError) {
@@ -214,6 +195,16 @@ function setupOF() {
         uiError.classList.add("show");
       }
     }
+
+    if (autoCloseTimer) clearTimeout(autoCloseTimer);
+    autoCloseTimer = setTimeout(() => {
+      try { dialog.close(); } catch {}
+    }, 10000);
+  });
+
+  troll.addEventListener("ended", () => { // chiude quando finisce [web:229]
+    if (autoCloseTimer) clearTimeout(autoCloseTimer);
+    try { dialog.close(); } catch {}
   });
 
   closeBtn.addEventListener("click", () => dialog.close());
@@ -226,13 +217,34 @@ function setupOF() {
     if (!inside) dialog.close();
   });
 
-  dialog.addEventListener("close", async () => { // [web:179]
-    troll.pause(); // [web:183]
+  dialog.addEventListener("close", async () => { // ripristino [web:179]
+    if (autoCloseTimer) clearTimeout(autoCloseTimer);
+
+    troll.pause();
+
     if (bgWasPlaying) {
       try {
-        bg.currentTime = bgResumeTime; // [web:186]
-        await bg.play(); // [web:53]
+        bg.currentTime = bgResumeTime;
+        await bg.play();
       } catch {}
+    }
+
+    const musicBtn = document.getElementById("musicBtn");
+    if (musicBtn) {
+      musicBtn.setAttribute("aria-pressed", String(!bg.paused));
+      const dot = musicBtn.querySelector(".music-dot");
+      const label = musicBtn.querySelector(".music-label");
+      if (dot && label) {
+        if (!bg.paused) {
+          label.textContent = "Music: On";
+          dot.style.background = "rgba(255,215,0,0.75)";
+          dot.style.boxShadow = "0 0 14px rgba(255,215,0,0.45)";
+        } else {
+          label.textContent = "Music: Off";
+          dot.style.background = "rgba(255,68,68,0.55)";
+          dot.style.boxShadow = "0 0 12px rgba(255,68,68,0.35)";
+        }
+      }
     }
   });
 }
