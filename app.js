@@ -110,7 +110,7 @@ class MusicPlayer {
     }
 
     try {
-      await this.audio.play();
+      await this.audio.play(); // play() returns a Promise [web:269]
       this.isPlaying = true;
       this.updateUI();
       this.errorMsg?.classList.remove("show");
@@ -132,6 +132,26 @@ class MusicPlayer {
       this.dot.style.background = "rgba(255,68,68,0.55)";
       this.dot.style.boxShadow = "0 0 12px rgba(255,68,68,0.35)";
     }
+  }
+}
+
+function syncMusicToggleUI(bg) {
+  const musicBtn = document.getElementById("musicBtn");
+  if (!musicBtn || !bg) return;
+
+  musicBtn.setAttribute("aria-pressed", String(!bg.paused));
+  const dot = musicBtn.querySelector(".music-dot");
+  const label = musicBtn.querySelector(".music-label");
+  if (!dot || !label) return;
+
+  if (!bg.paused) {
+    label.textContent = "Music: On";
+    dot.style.background = "rgba(255,215,0,0.75)";
+    dot.style.boxShadow = "0 0 14px rgba(255,215,0,0.45)";
+  } else {
+    label.textContent = "Music: Off";
+    dot.style.background = "rgba(255,68,68,0.55)";
+    dot.style.boxShadow = "0 0 12px rgba(255,68,68,0.35)";
   }
 }
 
@@ -166,7 +186,6 @@ function setupOF() {
 
   const bg = document.getElementById("bgMusic");
   const troll = document.getElementById("trollAudio");
-  const uiError = document.getElementById("audioError");
 
   if (!btn || !dialog || !closeBtn || !bg || !troll) return;
 
@@ -179,21 +198,13 @@ function setupOF() {
     bgResumeTime = bg.currentTime || 0;
 
     bg.pause();
+    syncMusicToggleUI(bg);
 
     try { dialog.showModal(); } catch { dialog.setAttribute("open", ""); }
 
     troll.currentTime = 0;
     troll.volume = 0.9;
-
-    try {
-      await troll.play();
-      uiError?.classList.remove("show");
-    } catch {
-      if (uiError) {
-        uiError.textContent = "Cannot play audio";
-        uiError.classList.add("show");
-      }
-    }
+    try { await troll.play(); } catch {}
 
     if (autoCloseTimer) clearTimeout(autoCloseTimer);
     autoCloseTimer = setTimeout(() => {
@@ -201,7 +212,7 @@ function setupOF() {
     }, 10000);
   });
 
-  troll.addEventListener("ended", () => {
+  troll.addEventListener("ended", () => { // ended event [web:229]
     if (autoCloseTimer) clearTimeout(autoCloseTimer);
     try { dialog.close(); } catch {}
   });
@@ -227,24 +238,41 @@ function setupOF() {
         await bg.play();
       } catch {}
     }
+    syncMusicToggleUI(bg);
+  });
+}
 
-    const musicBtn = document.getElementById("musicBtn");
-    if (musicBtn) {
-      musicBtn.setAttribute("aria-pressed", String(!bg.paused));
-      const dot = musicBtn.querySelector(".music-dot");
-      const label = musicBtn.querySelector(".music-label");
-      if (dot && label) {
-        if (!bg.paused) {
-          label.textContent = "Music: On";
-          dot.style.background = "rgba(255,215,0,0.75)";
-          dot.style.boxShadow = "0 0 14px rgba(255,215,0,0.45)";
-        } else {
-          label.textContent = "Music: Off";
-          dot.style.background = "rgba(255,68,68,0.55)";
-          dot.style.boxShadow = "0 0 12px rgba(255,68,68,0.35)";
-        }
-      }
+function setupAvatarGatito() {
+  const avatarBtn = document.getElementById("avatarBtn");
+  const bg = document.getElementById("bgMusic");
+  const gatito = document.getElementById("gatitoAudio");
+
+  if (!avatarBtn || !bg || !gatito) return;
+
+  let bgWasPlaying = false;
+  let bgResumeTime = 0;
+
+  avatarBtn.addEventListener("click", async () => {
+    bgWasPlaying = !bg.paused;
+    bgResumeTime = bg.currentTime || 0;
+
+    bg.pause();
+    syncMusicToggleUI(bg);
+
+    gatito.currentTime = 0;
+    gatito.volume = 0.9;
+
+    try { await gatito.play(); } catch {}
+  });
+
+  gatito.addEventListener("ended", async () => { // ended event [web:229]
+    if (bgWasPlaying) {
+      try {
+        bg.currentTime = bgResumeTime;
+        await bg.play();
+      } catch {}
     }
+    syncMusicToggleUI(bg);
   });
 }
 
@@ -253,6 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (canvas && canvas.getContext) new ParticleBackground(canvas);
 
   new MusicPlayer();
+  setupAvatarGatito();
   setupOF();
   setupMouseParallax();
   setupCardAnimations();
