@@ -37,11 +37,11 @@
 
   <main class="container">
     <section class="hero">
-      <div class="avatar-wrapper">
-        <div class="avatar" aria-label="Foto profilo">
+      <button id="avatarBtn" class="avatar-wrapper" type="button" aria-label="Riproduci gatito">
+        <span class="avatar" aria-hidden="true">
           <img class="avatar-img" src="./sky.jpg" alt="Foto profilo di stankygae">
-        </div>
-      </div>
+        </span>
+      </button>
 
       <h1 class="username">stankygae</h1>
       <p class="tagline">Link hub</p>
@@ -117,12 +117,16 @@
     <source src="./loser.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Musica troll -->
+  <!-- Troll -->
   <audio id="trollAudio" preload="none">
     <source src="./troll.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Gatito -->
+  <audio id="gatitoAudio" preload="none">
+    <source src="./gatito.mp3" type="audio/mpeg">
   </audio>
 
   <script src="./app.js" defer></script>
 </body>
 </html>
-
